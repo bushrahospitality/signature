@@ -1,89 +1,238 @@
- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD><TITLE>Email Signature</TITLE>
-<META content="text/html; charset=utf-8" http-equiv=Content-Type>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bushra Signature Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; max-width: 980px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display:block; font-weight: 700; margin: 10px 0 6px; }
+    input { width: 100%; padding: 10px; font-size: 14px; box-sizing: border-box; }
+    .row { display:flex; gap: 12px; }
+    .row > div { flex: 1; }
+    button { padding: 12px 14px; font-size: 14px; cursor:pointer; }
+    .actions { display:flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .hint { background:#f6f6f6; padding: 12px; border-radius: 10px; margin: 16px 0; }
+    .previewWrap { border:1px solid #ddd; padding: 14px; border-radius: 10px; }
+    textarea { width:100%; min-height: 180px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; padding: 10px; box-sizing: border-box; }
+    @media (max-width: 840px) { .grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
-<BODY style="font-size: 10pt; font-family: Arial, sans-serif;">
+<body>
 
-<table cellspacing="0" cellpadding="0" border="0" style="COLOR: #262626; FONT-FAMILY: Arial, sans-serif; width:420px;">
+<h2>Bushra Hospitality — Email Signature Generator</h2>
+
+<div class="hint">
+  <b>How to use:</b>
+  Fill the fields → click <b>Copy signature</b> → paste in Outlook signature editor.<br>
+  <b>Note:</b> Outlook might not show the exact final look until you send a test email (normal).
+</div>
+
+<div class="grid">
+  <div>
+    <h3>Employee Info</h3>
+
+    <label>Arabic Name (الاسم بالعربي)</label>
+    <input id="arName" placeholder="مثال: د. عصام بن سليمان قطان" />
+
+    <label>English Name</label>
+    <input id="enName" placeholder="Example: Dr. Esam S. Qattan" />
+
+    <label>Arabic Title (المسمى الوظيفي بالعربي)</label>
+    <input id="arTitle" placeholder="مثال: المدير التنفيذي للخدمات المساندة" />
+
+    <label>English Title</label>
+    <input id="enTitle" placeholder="Example: CSSO" />
+
+    <div class="row">
+      <div>
+        <label>Email</label>
+        <input id="email" placeholder="name@bushra.com.sa" />
+      </div>
+      <div>
+        <label>Mobile</label>
+        <input id="mobile" placeholder="05XXXXXXXX" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="copyBtn">Copy signature</button>
+      <button id="downloadBtn" type="button">Download HTML file</button>
+      <button id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <p id="status" style="margin-top:10px;"></p>
+
+    <h3 style="margin-top:18px;">Generated HTML (for IT / backup)</h3>
+    <textarea id="htmlOut" readonly></textarea>
+  </div>
+
+  <div>
+    <h3>Preview</h3>
+    <div class="previewWrap" id="preview"></div>
+
+    <div class="hint" style="margin-top:14px;">
+      <b>Outlook install:</b> Outlook (Windows) → File → Options → Mail → Signatures → New → Paste → Save.<br>
+      <b>Outlook Web:</b> Settings ⚙️ → Mail → Compose and reply → Paste → Save.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ✅ IMPORTANT: This must be the exact folder URL where images are hosted.
+  // If your images are in /signature/ then keep it like this.
+  const BASE_URL = "https://bushrahospitality.github.io/signature/";
+
+  const els = {
+    arName: document.getElementById("arName"),
+    enName: document.getElementById("enName"),
+    arTitle: document.getElementById("arTitle"),
+    enTitle: document.getElementById("enTitle"),
+    email: document.getElementById("email"),
+    mobile: document.getElementById("mobile"),
+    preview: document.getElementById("preview"),
+    htmlOut: document.getElementById("htmlOut"),
+    status: document.getElementById("status"),
+    copyBtn: document.getElementById("copyBtn"),
+    downloadBtn: document.getElementById("downloadBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+  };
+
+  function esc(s) {
+    return (s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function buildSignatureHTML() {
+    const arName = esc(els.arName.value.trim() || "[الاسم بالعربي]");
+    const enName = esc(els.enName.value.trim() || "[Full Name in English]");
+    const arTitle = esc(els.arTitle.value.trim() || "[المسمى الوظيفي بالعربي]");
+    const enTitle = esc(els.enTitle.value.trim() || "[Job Title in English]");
+    const email  = esc(els.email.value.trim()  || "[email@bushra.com.sa]");
+    const mobile = esc(els.mobile.value.trim() || "[05XXXXXXXX]");
+
+    // ✅ Outlook-safe table layout + absolute image URLs
+    return `
+<table cellspacing="0" cellpadding="0" border="0" style="color:#262626; font-family:Arial, sans-serif; width:420px;">
   <tbody>
-  <tr>
-    <td style="FONT-SIZE: 10pt; FONT-FAMILY: 'Lama', Arial, sans-serif; WIDTH: 200px; COLOR: #262626;line-height:10px; border-right: solid 2px #103c68; ; padding-right:10px;">
-		 <br>
-        <span dir="rtl" style="FONT-SIZE: 14pt; text-align:right; direction:rtl; COLOR: #103c68;"><strong>د. عصام بن سليمان قطان  </strong></span>
-		<span style="FONT-SIZE: 12pt; text-align:left; direction:ltr; COLOR: #103c68;"><strong> <br><br> Dr. Esam S. Qattan </strong></span>
-        <span dir="rtl" style="FONT-SIZE: 11pt;  text-align:right; direction:rtl ; COLOR: #b19057;"> <br><br> المدير التنفيذي للخدمات المساندة </span>
-		 <span style="FONT-SIZE: 11pt; text-align: left; direction:ltr; COLOR: #b19057;"> <br><br> CSSO </span>
-
-        <br><br>
-    </td>
-    <td style="FONT-SIZE: 9pt; width: 220px; line-height:18px; padding-left: 15px;">
-        
-        <span style="FONT-SIZE: 9pt; COLOR: #262626;"><strong>E:</strong> e.qattan@bushra.com.sa <br></span>
-        <span style="FONT-SIZE: 9pt; COLOR: #262626;"><strong>M:</strong> 0560054005 <br></span>
-       
-
-        
-        
-            <a href="https://bushra.com.sa/" target="_blank" rel="noopener" style=" text-decoration:none;"><strong style="color:#103c68; font-family:Arial, sans-serif; font-size:9pt">www.bushra.com.sa</strong></a>
+    <tr>
+      <td style="font-size:10pt; font-family:Arial, sans-serif; width:200px; color:#262626; line-height:10px; border-right:solid 2px #103c68; padding-right:10px;">
         <br>
-         <table>
-            <tbody>
-                <tr>
-                    <td style="width: 30px"><a href="https://www.facebook.com/bushradeyafah" target="_blank" rel="noopener"><img border="0" src="fb.png" alt="facebook icon" width="26" height="26" style="border:0; width:26px; height:26px"></a></td>
-                    <td style="width: 30px"><a href="https://x.com/bushra_deyafah" target="_blank" rel="noopener"><img border="0" src="tt.png" alt="twitter icon" width="26" height="26" style="border:0; width:26px; height:26px"></a></td>
-                    <td style="width: 30px"><a href="https://www.youtube.com/channel/UC4sgKppXAENQpv3r2ahsN5A" target="_blank" rel="noopener"><img border="0" src="yt.png" alt="youtube icon" width="26" height="26" style="border:0; width:26px; height:26px"></a></td>
-                    <td style="width: 30px"><a href="https://www.linkedin.com/company/bushradeyafah/" target="_blank" rel="noopener"><img border="0" src="ln.png" alt="linkedin icon" width="26" height="26" style="border:0; width:26px; height:26px"></a></td>
-                    <td style="width: 30px"><a href="https://instagram.com/bushra_deyafah/" target="_blank" rel="noopener"><img border="0" src="it.png" alt="instagram icon" width="26" height="26" style="border:0; width:26px; height:26px"></a></td>
-                    
-                </tr>
-            </tbody>
-        </table>
-		
-    </td>
-  </tr>
-  <tr>
-      <td colspan="2" style="padding-top: 15px; max-width: 420px;">
-          <span>
-                    
-                    <a href="https://bushra.com.sa/" target="_blank" rel="noopener"><img border="0" src="banner.png" alt="Banner" width="420" style="max-width:420px; height:auto; border:0;"></a>
-            </span>
+        <span dir="rtl" style="font-size:14pt; text-align:right; direction:rtl; color:#103c68;">
+          <strong>${arName}</strong>
+        </span>
+        <span dir="ltr" style="font-size:12pt; text-align:left; direction:ltr; color:#103c68;">
+          <strong><br><br>${enName}</strong>
+        </span>
+        <span dir="rtl" style="font-size:11pt; text-align:right; direction:rtl; color:#b19057;">
+          <br><br>${arTitle}
+        </span>
+        <span dir="ltr" style="font-size:11pt; text-align:left; direction:ltr; color:#b19057;">
+          <br><br>${enTitle}
+        </span>
+        <br><br>
       </td>
-  </tr>
-	     
-</tbody></table>
 
- 
-</BODY>
+      <td style="font-size:9pt; width:220px; line-height:18px; padding-left:15px;">
+        <span style="font-size:9pt; color:#262626;"><strong>E:</strong> ${email}<br></span>
+        <span style="font-size:9pt; color:#262626;"><strong>M:</strong> ${mobile}<br></span>
 
-</HTML>  
+        <a href="https://bushra.com.sa/" target="_blank" rel="noopener" style="text-decoration:none;">
+          <strong style="color:#103c68; font-family:Arial, sans-serif; font-size:9pt;">www.bushra.com.sa</strong>
+        </a>
+        <br>
 
+        <table cellspacing="0" cellpadding="0" border="0">
+          <tbody>
+            <tr>
+              <td style="width:30px;"><a href="https://www.facebook.com/bushradeyafah" target="_blank" rel="noopener">
+                <img border="0" src="${BASE_URL}fb.png" alt="Facebook" width="26" height="26" style="border:0; width:26px; height:26px;"></a></td>
 
+              <td style="width:30px;"><a href="https://x.com/bushra_deyafah" target="_blank" rel="noopener">
+                <img border="0" src="${BASE_URL}tt.png" alt="X" width="26" height="26" style="border:0; width:26px; height:26px;"></a></td>
 
+              <td style="width:30px;"><a href="https://www.youtube.com/channel/UC4sgKppXAENQpv3r2ahsN5A" target="_blank" rel="noopener">
+                <img border="0" src="${BASE_URL}yt.png" alt="YouTube" width="26" height="26" style="border:0; width:26px; height:26px;"></a></td>
 
+              <td style="width:30px;"><a href="https://www.linkedin.com/company/bushradeyafah/" target="_blank" rel="noopener">
+                <img border="0" src="${BASE_URL}ln.png" alt="LinkedIn" width="26" height="26" style="border:0; width:26px; height:26px;"></a></td>
 
+              <td style="width:30px;"><a href="https://instagram.com/bushra_deyafah/" target="_blank" rel="noopener">
+                <img border="0" src="${BASE_URL}it.png" alt="Instagram" width="26" height="26" style="border:0; width:26px; height:26px;"></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
 
+    <tr>
+      <td colspan="2" style="padding-top:15px; max-width:420px;">
+        <a href="https://bushra.com.sa/" target="_blank" rel="noopener">
+          <img border="0" src="${BASE_URL}banner.png" alt="Banner" width="420" style="max-width:420px; height:auto; border:0;">
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>`.trim();
+  }
 
+  function render() {
+    const html = buildSignatureHTML();
+    els.preview.innerHTML = html;
+    els.htmlOut.value = html;
+  }
 
+  async function copyToClipboard() {
+    const html = buildSignatureHTML();
+    try {
+      // Copy as rich HTML (best for Outlook)
+      const blob = new Blob([html], { type: "text/html" });
+      const item = new ClipboardItem({ "text/html": blob, "text/plain": new Blob([html], {type:"text/plain"}) });
+      await navigator.clipboard.write([item]);
+      els.status.textContent = "✅ Copied! Now paste into Outlook Signature editor.";
+    } catch (e) {
+      // Fallback: copy plain text HTML
+      await navigator.clipboard.writeText(html);
+      els.status.textContent = "✅ Copied (fallback). Paste into Outlook signature editor. If formatting is wrong, use the Download HTML option.";
+    }
+  }
 
+  function downloadHTMLFile() {
+    const html = buildSignatureHTML();
+    const fullDoc =
+`<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>${html}</body>
+</html>`;
+    const blob = new Blob([fullDoc], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bushra-signature.html";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    els.status.textContent = "✅ Downloaded HTML file.";
+  }
 
+  function resetForm() {
+    ["arName","enName","arTitle","enTitle","email","mobile"].forEach(id => els[id].value = "");
+    els.status.textContent = "";
+    render();
+  }
 
+  ["arName","enName","arTitle","enTitle","email","mobile"].forEach(id => {
+    els[id].addEventListener("input", render);
+  });
 
+  els.copyBtn.addEventListener("click", copyToClipboard);
+  els.downloadBtn.addEventListener("click", downloadHTMLFile);
+  els.resetBtn.addEventListener("click", resetForm);
 
+  render();
+</script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</body>
+</html>
